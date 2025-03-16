@@ -21,6 +21,8 @@ let elements = {
     $nextStepBtn : $modal.querySelector('.next-button'),
     $modalTitle : $modal.querySelector('.modal-title'),
     $uploadArea : $modal.querySelector('.upload-area'), // 드래그 영역
+    $contentTextarea : $modal.querySelector('.content-input textarea'),
+    $charCounter : $modal.querySelector('.char-counter'),
 };
 
 
@@ -182,10 +184,31 @@ function setUpModalEvents() {
         }
     });
 }
+
+// 피드 내용 입력 이벤트
+function setupTextareaEvents() {
+
+    const { $contentTextarea, $charCounter}= elements;
+
+    $contentTextarea.addEventListener('input', () => {
+        const length = $contentTextarea.value.length;
+        $charCounter.textContent = `${length.toString()} / 2,200`;
+
+        if (length > 2200) {
+            $charCounter.classList.add('exceed');
+            $contentTextarea.value = $contentTextarea.value.slice(0, 2200);
+        } else {
+            $charCounter.classList.remove('exceed');
+        }
+    });
+}
+
+
 // 이벤트 바인딩 관련 함수
 function bindEvents() {
-    setUpModalEvents();
-    setUpFileUploadEvents();
+    setUpModalEvents(); // 모달 관련 이벤트
+    setUpFileUploadEvents(); // 파일업로드 관련 이벤트
+    setupTextareaEvents(); // 텍스트 입력 관련 이벤트
 }
 
 // 모달 관련 JS 함수 - 외부에 노출
