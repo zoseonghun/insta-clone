@@ -72,7 +72,7 @@ class CarouselManager {
 
     // 슬라이드 X축 이동함수
     goToSlide(index) {
-        if (index < 0 || index > this.slidex.length - 1) return;
+        if (index < 0 || index > this.slides.length - 1) return;
 
         // 현재 인덱스 갱신
         this.currentIndex = index;

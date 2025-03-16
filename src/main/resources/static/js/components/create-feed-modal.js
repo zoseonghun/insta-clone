@@ -20,6 +20,7 @@ let elements = {
     $backStepBtn : $modal.querySelector('.back-button'),
     $nextStepBtn : $modal.querySelector('.next-button'),
     $modalTitle : $modal.querySelector('.modal-title'),
+    $uploadArea : $modal.querySelector('.upload-area'), // 드래그 영역
 };
 
 
@@ -56,10 +57,29 @@ function goToStep(step) {
 
 // 파일 업로드 관련 이벤트 함수
 function setUpFileUploadEvents() {
-    const {$uploadBtn, $fileInput} = elements;
+    const {$uploadBtn, $fileInput, $uploadArea} = elements;
+
+    // 파일을 검사하는 함수
+    const validateFiles = (files) => {
+        return files
+            .filter((file) => {
+            if (!file.type.startsWith('image')) {
+                alert(`${file.name}은(는) 이미지가 아닙니다.`);
+                return false;
+            }
+            return true;
+        })
+         .filter((file) => {
+            if (file.size > 10 * 1024 * 1024) {
+                alert(`${file.name}은(는) 10MB를 초과합니다.`);
+                return false;
+            }
+            return true;
+        });
+    };
 
     // 파일을 검사하고 다음 단계로 이동하는 함수
-    const handleFiles = files => {
+    const handleFiles = (files) => {
         // 파일의 개수가 10개가 넘는지 검사
         if (files.length > 10) {
             alert('최대 10개의 파일만 선택 가능합니다.');
@@ -67,19 +87,7 @@ function setUpFileUploadEvents() {
         }
 
         // 파일이 이미지인지 확인
-        const validFiles =  files.filter(file => {
-            if (!file.type.startsWith('image')) {
-                alert(`${file.name}은(는) 이미지가 아닙니다.`);
-                return false;
-            }
-             return true;
-        }).filter(file => {
-            if (file.size > 10 * 1024 * 1024) {
-                alert(`${file.name}은(는) 10MB를 초과합니다.`);
-                return false;
-            }
-            return true;
-        });
+        const validFiles = validateFiles(files);
 
        // 이미 생성되어 있다면, 그냥 init()만 다시 호출해서 '슬라이드 목록'만 업데이트
        if (step2Carousel && step3Carousel) {
@@ -107,6 +115,30 @@ function setUpFileUploadEvents() {
         const files = [...e.target.files];
         if (files.length > 0 ) handleFiles(files);
 
+    });
+
+    // 파일 드래그 & 드롭 이벤트
+    // 드래그 영역에 진입했을 때
+    $uploadArea.addEventListener('dragover', e => {
+        e.preventDefault();
+        $uploadArea.classList.add('dragover');
+
+    });
+
+    // 드래그 영역에서 나갔을 때
+    $uploadArea.addEventListener('dragleave', e => {
+        e.preventDefault();
+        $uploadArea.classList.remove('dragover');
+
+    });
+    // 드래그 영역에 드롭했을 때
+    $uploadArea.addEventListener('drop', e => {
+        e.preventDefault(); // 드롭했을 때 이미지 새탭이 열리거나 파일이 다운로드되는 것을 방지
+
+        // 파일 정보 얻어오기
+        const files = [...e.dataTransfer.files];
+        // 파일 검증
+        if (files.length > 0) handleFiles(files);
     });
 }
 
