@@ -6,7 +6,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,6 +21,7 @@ public class AuthController {
 
     private final MemberService memberService;
 
+    // 회원가입 요청
     @PostMapping("/signup")
     public ResponseEntity<Map<String, Object>> signUp(@RequestBody @Valid SignUpRequest signUpRequest) {
         log.info("request for signup: {}", signUpRequest.getUsername());
@@ -33,7 +33,6 @@ public class AuthController {
                         "message", "회원가입이 완료되었습니다.",
                         "username", signUpRequest.getUsername()
                 ));
-
     }
 
 

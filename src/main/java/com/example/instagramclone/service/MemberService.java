@@ -22,9 +22,9 @@ public class MemberService {
     public void signUp(SignUpRequest signUpRequest) {
 
         // 순수 비밀번호를 꺼내서 암호화
-        String rawPasswrod = signUpRequest.getPassword();
+        String rawPassword = signUpRequest.getPassword();
         // 암호화된 패스워드
-        String encodedPassword = passwordEncoder.encode(rawPasswrod);
+        String encodedPassword = passwordEncoder.encode(rawPassword);
 
         // 회원정보를 엔터티로 변환
         Member newMember = signUpRequest.toEntity();

@@ -15,6 +15,11 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
         // 커스텀 보안 설정
+        http
+                .csrf(csrf -> csrf.disable())
+                .cors(cors -> cors.configure(http))
+
+                ;
 
         return http.build();
     }
