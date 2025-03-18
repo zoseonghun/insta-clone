@@ -1,5 +1,5 @@
 
-import { ValidationRules } from "./validation.js";
+import { ValidationRules, checkPasswordStrength } from "./validation.js";
 import { debounce } from "../util/debounce.js";
 
 // 회원 가입정보를 서버에 전송하기
@@ -90,7 +90,9 @@ function validateField($input) {
         if (fieldName === 'email') {
             validateEmailOrPhone($formField, inputValue);
         } else if (fieldName === 'password') {
-
+            validatePassword($formField, inputValue);
+        } else if (fieldName === 'username') {
+            validateUsername($formField, inputValue);
         }
     }
 
@@ -137,12 +139,64 @@ function validateEmailOrPhone($formField, inputValue) {
             showError($formField, ValidationRules.phone.message);
         } else {
             // 서버에 통신해서 중복체크
-
+        }
     }
 
-
-    }
 }
+
+// 비밀번호 검증 (길이, 강도체크)
+function validatePassword($formField, inputValue) {
+    // 길이 확인
+    if (!ValidationRules.password.patterns.length.test(inputValue)) {
+        showError($formField, ValidationRules.password.messages.length);
+    }
+
+    // 강도 체크
+    const strength = checkPasswordStrength(inputValue);
+    switch (strength) {
+        case 'weak': // 에러로 볼것임
+            showError($formField, ValidationRules.password.messages.weak);
+            break;
+        case 'medium': // 에러는 아님
+            showPasswordFeedback
+            ($formField, ValidationRules.password.messages.medium,
+                'warning'
+            );
+            break;
+        case 'strong': // 에러는 아님
+            showPasswordFeedback
+            ($formField, ValidationRules.password.messages.strong,
+                'success'
+            );
+            break;
+    }
+
+}
+
+/**
+ * 비밀번호 강도 피드백 표시
+ */
+function showPasswordFeedback($formField, message, type) {
+    const $feedback = document.createElement('span');
+    $feedback.className = `password-feedback ${type}`;
+    $feedback.textContent = message;
+    $formField.append($feedback);
+}
+
+/**
+ * 사용자 이름(username) 필드 검증
+ */
+function validateUsername($formField, inputValue) {
+
+    if (!ValidationRules.username.pattern.test(inputValue)) {
+        showError($formField, ValidationRules.username.message);
+    }
+
+    // 중복검사
+
+}
+
+
 
 //====== 메인 실행 코드 ======//
 document.addEventListener('DOMContentLoaded', initSignUp);
