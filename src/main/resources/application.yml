@@ -31,3 +31,9 @@ logging:
 file:
   upload:
     location: ${user.home}/instagram-clone/uploads/
+
+jwt:
+  secret-key: pkv1AsIhGj2D1r2uMknCnFqcZWLBkrwUEMA4GYVi1+E=  # 토큰발급시와 토큰위조검사시 사용할 서명
+  access-token-validity-time: 3600000  # 1시간 (ms)
+  refresh-token-validity-time: 604800000 # 7일 (ms)
+
