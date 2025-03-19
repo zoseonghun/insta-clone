@@ -9,6 +9,7 @@ import com.example.instagramclone.exception.MemberException;
 import com.example.instagramclone.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.parameters.P;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -109,13 +110,15 @@ public class MemberService {
      */
     @Transactional(readOnly = true)
     public Map<String, Object> authenticate(LoginRequest loginRequest) {
-
         String username = loginRequest.getUsername();
 
-        Member foundMember = memberRepository.findByEmail(username)
-                .orElseThrow(
-                        () -> new MemberException(ErrorCode.MEMBER_NOT_FOUND, "존재하지 않는 회원입니다.")
-                ); // 조회가 실패했다면 예외 발생
+        Member foundMember = memberRepository.findByUsername(username)
+                .orElseGet(() -> memberRepository.findByEmail(username)
+                        .orElseGet(() -> memberRepository.findByPhone(username)
+                                        .orElseThrow(
+                                                () -> new MemberException(ErrorCode.MEMBER_NOT_FOUND)
+                                        )));
+
 
         // 사용자가 입력한 패스워드와 DB에 저장된 패스워드를 추출
         String inputPassword = loginRequest.getPassword();
