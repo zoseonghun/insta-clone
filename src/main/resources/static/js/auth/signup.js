@@ -2,6 +2,14 @@
 import { ValidationRules, checkPasswordStrength } from "./validation.js";
 import { debounce } from "../util/debounce.js";
 
+// 모든 input별로 이전 값을 저장할 객체를 만듦
+const previousValues = {
+    emailOrPhone: '',
+    name: '',
+    username: '',
+    password: ''
+};
+
 // 회원 가입정보를 서버에 전송하기
 async function fetchToSignUp(userData) {
 
@@ -13,7 +21,8 @@ async function fetchToSignUp(userData) {
 
     const data = await response.json();
 
-    alert(data.message);
+    // alert(data.message);
+    window.location.href = '/'; // 로그인 페이지 이동
 }
 
 // 초기화 함수
@@ -51,10 +60,33 @@ function initSignUp() {
         updateSubmitButton($inputs, $submitButton); // 가입 버튼 활성화/비활성화 처리
     }, 700);
 
+    // input 이벤트 핸들러
+    const handleInput = ($input) => {
+        removeErrorMessage($input.closest('.form-field'));
+
+        // 디바운스 + 비동기 검증
+        debouncedValidate($input);
+    };
+
+    const handleBlur = $input => {
+        const fieldName = $input.name;
+        const currentValue = $input.value.trim();
+
+        // 빈값이거나 값이 바뀐 적이 있을 때만 혹은 이전 값이랑 달라졌을 때만 검증
+        if (!currentValue || previousValues[fieldName] !== currentValue) {
+            previousValues[fieldName] = currentValue; // 이전 값 갱신
+            removeErrorMessage($input.closest('.form-field'));
+
+            // 디바운스가 아니라, blur 시점에는 바로 검증할 수도 있음
+            validateField($input);
+            updateSubmitButton($inputs, $submitButton);
+        }
+    };
+
     // 4개의 입력창에 입력 이벤트 바인딩
-    Object.values($inputs).forEach($input => {
+    Object.values($inputs).forEach(($input) => {
         $input.addEventListener('input', () => handleInput($input));
-        $input.addEventListener('blur', () => handleInput($input));
+        $input.addEventListener('blur', () => handleBlur($input));
     });
 
     // 폼 이벤트 핸들러 바인딩
