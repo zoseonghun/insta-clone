@@ -4,6 +4,7 @@ package com.example.instagramclone.jwt;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
@@ -53,11 +54,13 @@ public class JwtTokenProvider {
         // 만료 시간
         Date validity = new Date(now.getTime() + validityTime);
 
+        // 서명을 넣어야 함
         return Jwts.builder()
                 .setIssuer("Instagram clone") // 발급자 정보
                 .setIssuedAt(now) // 발급시간
                 .setExpiration(validity) // 만료시간
                 .setSubject(username) // 이 토큰을 구별할 유일한 값
+                .signWith(key) // 서명 포함
                 .compact();
     }
 
