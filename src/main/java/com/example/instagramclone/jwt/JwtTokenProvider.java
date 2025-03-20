@@ -60,4 +60,44 @@ public class JwtTokenProvider {
                 .setSubject(username) // 이 토큰을 구별할 유일한 값
                 .compact();
     }
+
+    /**
+     * 토큰이 유효한지 검증하는 메서드
+     * @param token JWT 토큰
+     * @return 토큰이 정상이면 true, 만료되었거나 위조되었다면 false
+     */
+    public boolean validateToken(String token) {
+        try {
+            parseClaims(token);
+            return true;
+        } catch (JwtException | IllegalArgumentException e) {
+            log.warn("invalid token: {}", e.getMessage(), e);
+            return false;
+        }
+    }
+
+    /**
+     * 검증된 토큰에서 사용자이름을 추출하는 메서드
+     * @param token - 인증 토큰
+     * @return 토큰에서 추출한 사용자 이름
+     */
+    public String getCurrentLoginUsername(String token) {
+        return parseClaims(token).getSubject();
+    }
+
+    /**
+     * 내부적으로 토큰을 파싱하여 Claims 객체를 반환하는 메서드입니다.
+     *
+     * @param token JWT 토큰
+     * @return 파싱된 Claims 객체
+     * @throws JwtException 토큰이 유효하지 않은 경우 발생
+     */
+    private Claims parseClaims(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+    }
+
 }
